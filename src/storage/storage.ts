@@ -12,6 +12,7 @@ export const STORAGE_PREFIX = 'shortpace:'
 /** Also read by the small script in index.html (prevents a white flash in dark mode). */
 export const THEME_KEY = `${STORAGE_PREFIX}theme`
 export const PROFILE_KEY = `${STORAGE_PREFIX}profile`
+export const LAST_SEEN_LEVEL_KEY = `${STORAGE_PREFIX}lastSeenLevel`
 export const RUNS_KEY = `${STORAGE_PREFIX}runs`
 /** Bump when the saved shape changes, and add a migration for the old version. */
 export const PROFILE_VERSION = 1
@@ -27,6 +28,9 @@ export interface KeyValueStore {
 export interface PreferencesRepository {
   getThemePreference(): ThemePreference
   setThemePreference(preference: ThemePreference): void
+  /** The level the user last saw celebrated (for the level-up moment). Null if never. */
+  getLastSeenLevel(): number | null
+  setLastSeenLevel(level: number): void
 }
 
 export interface ProfileRepository {
@@ -63,6 +67,21 @@ export function createPreferencesRepository(store: KeyValueStore | null): Prefer
         store?.setItem(THEME_KEY, preference)
       } catch {
         // Not saved; the choice still applies until the page is reloaded.
+      }
+    },
+    getLastSeenLevel() {
+      try {
+        const level = Number(store?.getItem(LAST_SEEN_LEVEL_KEY))
+        return Number.isInteger(level) && level >= 1 && level <= 10 ? level : null
+      } catch {
+        return null
+      }
+    },
+    setLastSeenLevel(level) {
+      try {
+        store?.setItem(LAST_SEEN_LEVEL_KEY, String(level))
+      } catch {
+        // Not saved: worst case the celebration shows again next time.
       }
     },
   }

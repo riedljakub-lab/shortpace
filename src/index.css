@@ -95,3 +95,39 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Level-up moment: scissors snip across, then the new inseam number drops in.
+   With "reduce motion" the rule above shortens these to nothing: you just see the result. */
+@theme {
+  --animate-snip: snip 1.1s ease-in-out both;
+  --animate-drop: drop 0.5s 0.9s cubic-bezier(0.3, 1.5, 0.6, 1) both;
+
+  @keyframes snip {
+    0% {
+      transform: translateX(-90px) rotate(0deg);
+    }
+    25% {
+      transform: translateX(-55px) rotate(-14deg);
+    }
+    50% {
+      transform: translateX(-25px) rotate(0deg);
+    }
+    75% {
+      transform: translateX(-8px) rotate(-14deg);
+    }
+    100% {
+      transform: translateX(0) rotate(0deg);
+    }
+  }
+
+  @keyframes drop {
+    0% {
+      transform: translateY(-0.8em);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
