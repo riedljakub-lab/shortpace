@@ -14,6 +14,7 @@
   --sp-ink: #0f172a; /* main text */
   --sp-muted: #475569; /* secondary text */
   --sp-line: #dde3ec; /* decorative borders */
+  --sp-control: #7b889c; /* borders of inputs and choice cards (needs 3:1) */
   --sp-accent: #0047ab; /* cobalt: links, primary buttons, focus ring */
   --sp-accent-hover: #003a8c;
   --sp-on-accent: #ffffff; /* text on accent backgrounds */
@@ -32,6 +33,7 @@
   --sp-ink: #e5e9f0;
   --sp-muted: #9aa6b8;
   --sp-line: #24304a;
+  --sp-control: #5b6b86;
   --sp-accent: #6e9cff;
   --sp-accent-hover: #8db1ff;
   --sp-on-accent: #0b1120;
@@ -50,6 +52,7 @@
   --color-ink: var(--sp-ink);
   --color-muted: var(--sp-muted);
   --color-line: var(--sp-line);
+  --color-control: var(--sp-control);
   --color-accent: var(--sp-accent);
   --color-accent-hover: var(--sp-accent-hover);
   --color-on-accent: var(--sp-on-accent);
