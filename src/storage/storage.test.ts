@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { SAMPLE_PROFILE } from '../test/fixtures'
+import { SAMPLE_PROFILE, sampleRun } from '../test/fixtures'
 import {
   createPreferencesRepository,
   createProfileRepository,
+  createRunRepository,
   PROFILE_KEY,
+  RUNS_KEY,
   THEME_KEY,
   type KeyValueStore,
 } from './storage'
@@ -102,6 +104,59 @@ describe('profile repository', () => {
       expect(repo.saveProfile(SAMPLE_PROFILE)).toBe(false)
       expect(repo.getProfile()).toBeNull()
       expect(() => repo.deleteProfile()).not.toThrow()
+    }
+  })
+})
+
+describe('run repository', () => {
+  it('starts empty', () => {
+    expect(createRunRepository(memoryStore()).listRuns()).toEqual([])
+  })
+
+  it('round-trips runs, including optional fields', () => {
+    const repo = createRunRepository(memoryStore())
+    const full = sampleRun({
+      id: 'run-2',
+      avgHeartRate: 152,
+      notes: 'Windy',
+      splitsSecPerKm: [330, 325],
+      createdAt: '2026-11-20T19:00:00.000Z',
+    })
+    expect(repo.saveRuns([sampleRun(), full])).toBe(true)
+    expect(repo.listRuns()).toEqual([full, sampleRun()])
+  })
+
+  it('lists newest first (by date, then by when it was logged)', () => {
+    const repo = createRunRepository(memoryStore())
+    repo.saveRuns([
+      sampleRun({ id: 'old', date: '2026-11-01' }),
+      sampleRun({ id: 'new-early', date: '2026-11-20', createdAt: '2026-11-20T07:00:00Z' }),
+      sampleRun({ id: 'new-late', date: '2026-11-20', createdAt: '2026-11-20T19:00:00Z' }),
+    ])
+    expect(repo.listRuns().map((r) => r.id)).toEqual(['new-late', 'new-early', 'old'])
+  })
+
+  it('skips broken entries but keeps the good ones', () => {
+    const raw = JSON.stringify({
+      version: 1,
+      runs: [
+        sampleRun(),
+        { ...sampleRun({ id: 'x' }), effort: 11 },
+        { ...sampleRun({ id: 'y' }), type: 'sprint' },
+        { ...sampleRun({ id: 'z' }), distanceKm: -5 },
+        'nonsense',
+      ],
+    })
+    const repo = createRunRepository(memoryStore({ [RUNS_KEY]: raw }))
+    expect(repo.listRuns().map((r) => r.id)).toEqual(['run-1'])
+  })
+
+  it('never crashes on corrupted data or broken storage', () => {
+    expect(createRunRepository(memoryStore({ [RUNS_KEY]: '{oops' })).listRuns()).toEqual([])
+    for (const store of [null, brokenStore]) {
+      const repo = createRunRepository(store)
+      expect(repo.saveRuns([sampleRun()])).toBe(false)
+      expect(repo.listRuns()).toEqual([])
     }
   })
 })

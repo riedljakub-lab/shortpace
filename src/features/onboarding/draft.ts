@@ -5,7 +5,7 @@ import type { DistanceClassId } from '../../config/distances'
 import type { PersonaId } from '../../config/personas'
 import { PROFILE_LIMITS } from '../../config/profileRules'
 import { sortWeekdays, todayIso, type Weekday } from '../../domain/dates'
-import { formatPace, parseDuration, parsePace } from '../../domain/pace'
+import { formatPace, parseDuration, parseKm, parsePace } from '../../domain/pace'
 import type { Baseline, Profile, Sex } from '../../domain/types'
 
 export const STEP_IDS = [
@@ -67,12 +67,6 @@ export const INITIAL_DRAFT: OnboardingDraft = {
 
 const L = PROFILE_LIMITS
 const PACE_RANGE = `between ${formatPace(L.fastestPaceSecPerKm)} and ${formatPace(L.slowestPaceSecPerKm)}`
-
-/** "8", "8.5" or "8,5" → number. Anything else → null. */
-export function parseKm(text: string): number | null {
-  const normalized = text.trim().replace(',', '.')
-  return /^\d{1,3}(\.\d{1,2})?$/.test(normalized) ? Number(normalized) : null
-}
 
 function parseAge(text: string): number | null {
   return /^\d{1,3}$/.test(text.trim()) ? Number(text.trim()) : null
