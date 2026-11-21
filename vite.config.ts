@@ -10,5 +10,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // Load real CSS in tests (Vitest blanks it by default); contrast.test.ts reads the tokens.
+    css: true,
   },
 })
