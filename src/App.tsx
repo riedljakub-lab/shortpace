@@ -1,6 +1,7 @@
 import { HashRouter, Route, Routes } from 'react-router'
 import { LogPage } from './features/log/LogPage'
 import { OnboardingPage } from './features/onboarding/OnboardingPage'
+import { PlanPage } from './features/plan/PlanPage'
 import { SettingsPage } from './features/settings/SettingsPage'
 import { AppShell } from './layout/AppShell'
 import { HomePage } from './pages/HomePage'
@@ -24,7 +25,7 @@ export default function App() {
               </Route>
               <Route element={<AppShell />}>
                 <Route index element={<HomePage />} />
-                <Route path="plan" element={<PlaceholderPage title="Plan" />} />
+                <Route path="plan" element={<PlanPage />} />
                 <Route path="log" element={<LogPage />} />
                 <Route path="dashboard" element={<PlaceholderPage title="Dashboard" />} />
                 <Route path="settings" element={<SettingsPage />} />

@@ -1,15 +1,20 @@
-import { Navigate, useLocation } from 'react-router'
+import { Link, Navigate, useLocation } from 'react-router'
 import { distanceClass } from '../config/distances'
 import { persona } from '../config/personas'
 import { classLockStatus } from '../domain/classLock'
 import { todayIso, weekdayLabel, WEEKDAYS } from '../domain/dates'
 import { formatPace } from '../domain/pace'
+import { longestRecentKm } from '../domain/history'
+import { generateWeekPlan } from '../domain/plan'
+import { sessionTarget } from '../features/plan/sessionText'
 import { useProfile } from '../profile/profileContext'
+import { useRuns } from '../runs/runsContext'
 import { Avatar } from '../ui/Avatar'
 import { Notice } from '../ui/Notice'
 
 export function HomePage() {
   const { profile } = useProfile()
+  const { runs } = useRuns()
   const location = useLocation()
   const saveFailed = (location.state as { saveFailed?: boolean } | null)?.saveFailed === true
 
@@ -17,7 +22,13 @@ export function HomePage() {
   if (!profile) return <Navigate to="/onboarding" replace />
 
   const cls = distanceClass(profile.distanceClass)
-  const lock = classLockStatus(profile.classChosenOn, todayIso())
+  const today = todayIso()
+  const lock = classLockStatus(profile.classChosenOn, today)
+  const todaysSession = generateWeekPlan({
+    profile,
+    weekOf: today,
+    longestRecentKm: longestRecentKm({ profile, runs, onDate: today }),
+  }).days.find((d) => d.date === today)?.session
   const days = profile.runDays
     .map((id) => WEEKDAYS.find((d) => d.id === id)?.short ?? id)
     .join(', ')
@@ -44,6 +55,27 @@ export function HomePage() {
           </p>
         </div>
       </div>
+
+      {todaysSession ? (
+        <section
+          aria-labelledby="today-heading"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-accent p-5"
+        >
+          <div>
+            <h2 id="today-heading" className="text-sm font-medium text-muted">
+              Today
+            </h2>
+            <p className="text-xl font-bold">
+              {todaysSession.title}
+              {sessionTarget(todaysSession) ? ` · ${sessionTarget(todaysSession)}` : ''}
+            </p>
+            <p className="text-sm text-muted">{todaysSession.detail}</p>
+          </div>
+          <Link to="/plan" className="font-semibold text-accent underline-offset-4 hover:underline">
+            See your week
+          </Link>
+        </section>
+      ) : null}
 
       <dl className="grid gap-4 rounded-xl bg-surface p-5 sm:grid-cols-3">
         <div>
