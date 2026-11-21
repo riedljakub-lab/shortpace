@@ -4,7 +4,16 @@ import { formatDuration, formatKm, formatPace, paceFromTime } from '../../domain
 import type { Run } from '../../domain/types'
 import { Button } from '../../ui/Button'
 
-export function RunList({ runs, onDelete }: { runs: Run[]; onDelete: (run: Run) => void }) {
+export function RunList({
+  runs,
+  spikeRunIds = new Set(),
+  onDelete,
+}: {
+  runs: Run[]
+  /** Runs that were more than 10% longer than the longest run of the 30 days before. */
+  spikeRunIds?: ReadonlySet<string>
+  onDelete: (run: Run) => void
+}) {
   if (runs.length === 0) {
     return <p className="text-muted">No runs yet. Log your first one above.</p>
   }
@@ -40,7 +49,12 @@ export function RunList({ runs, onDelete }: { runs: Run[]; onDelete: (run: Run) 
                   {formatPace(paceFromTime(run.durationSec, run.distanceKm))} /km
                 </span>
               </p>
-              <p className="text-sm text-muted">{details.join(' · ')}</p>
+              <p className="text-sm text-muted">
+                {details.join(' · ')}
+                {spikeRunIds.has(run.id) ? (
+                  <span className="font-semibold text-warning"> · Big jump</span>
+                ) : null}
+              </p>
               {run.notes ? <p className="text-sm break-words">{run.notes}</p> : null}
             </div>
             <Button

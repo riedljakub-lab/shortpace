@@ -7,6 +7,7 @@ import { formatPace } from '../domain/pace'
 import { longestRecentKm } from '../domain/history'
 import { generateWeekPlan } from '../domain/plan'
 import { sessionTarget } from '../features/plan/sessionText'
+import { RestDayAlert } from '../features/guard/GuardNotice'
 import { useProfile } from '../profile/profileContext'
 import { useRuns } from '../runs/runsContext'
 import { Avatar } from '../ui/Avatar'
@@ -41,6 +42,8 @@ export function HomePage() {
           close the tab.
         </Notice>
       ) : null}
+
+      <RestDayAlert />
 
       <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
         <Avatar avatarId={profile.avatarId} className="h-56 w-auto shrink-0" />

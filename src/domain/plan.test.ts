@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { PERSONA_IDS, type PersonaId } from '../config/personas'
 import { addDays, mondayOf, weekdayOf, WEEKDAY_IDS, type Weekday } from './dates'
+import { checkSpike } from './guard'
 import { longestRecentKm } from './history'
 import {
   chooseRunDays,
@@ -213,9 +214,15 @@ describe('long run target', () => {
     expect(longRunTargetKm(p, 6)).toBe(6.5) // 6.6 → 6.5
   })
 
-  it('never goes below the minimum or above the class cap', () => {
+  it('uses the fresh-start minimum only when there are no recent runs, and caps per class', () => {
     expect(longRunTargetKm(p, 0)).toBe(2)
     expect(longRunTargetKm(p, 30)).toBe(14) // 10K cap
+  })
+
+  it('never plans a big jump for someone with a short history', () => {
+    expect(longRunTargetKm(p, 1)).toBe(1) // 1.1 → 1, not the 2 km minimum
+    expect(longRunTargetKm(p, 1.5)).toBe(1.5) // 1.65 → 1.5
+    expect(longRunTargetKm(p, 0.3)).toBe(0.3) // never rounds below what they already ran
   })
 })
 
@@ -258,5 +265,19 @@ describe('longestRecentKm', () => {
     const p = { longestRunKm30d: 12, classChosenOn: '2026-11-10' }
     expect(longestRecentKm({ profile: p, runs, onDate: '2026-11-21' })).toBe(12)
     expect(longestRecentKm({ profile: p, runs: [], onDate: '2026-12-31' })).toBe(0)
+  })
+})
+
+describe('plan and spike guard agree', () => {
+  it('never schedules a long run more than 10% over the recent longest run', () => {
+    for (const longest of [0.3, 0.9, 1, 1.5, 2.2, 3, 4.7, 8, 8.3, 10, 13.9, 25, 40]) {
+      for (const distanceClass of ['5k', '10k', 'half', 'marathon'] as const) {
+        const p = { ...profile({ runDays: ['tue', 'sat'], longRunDay: 'sat' }), distanceClass }
+        const target = longRunTargetKm(p, longest)
+        expect(checkSpike(target, longest).status, `${distanceClass} longest=${longest}`).not.toBe(
+          'spike',
+        )
+      }
+    }
   })
 })

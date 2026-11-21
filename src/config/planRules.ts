@@ -29,6 +29,7 @@ export const PLAN_RULES = {
 
   /** Long run grows at most 10% over the longest run of the last 30 days (matches the spike guard). */
   longRunGrowth: 0.1,
+  /** Long run for a fresh start (no runs in the last 30 days). */
   minLongRunKm: 2,
   longRunCapKm: { '5k': 8, '10k': 14, half: 21, marathon: 32 } satisfies Record<
     DistanceClassId,
