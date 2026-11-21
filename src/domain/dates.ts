@@ -42,3 +42,13 @@ export function daysBetween(from: string, to: string): number {
   }
   return Math.round((toUtc(to) - toUtc(from)) / 86_400_000)
 }
+
+/** "2026-11-20" → "Fri 20 Nov". */
+export function formatShortDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number) as [number, number, number]
+  return new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  }).format(new Date(y, m - 1, d))
+}

@@ -1,4 +1,4 @@
-import { Navigate, useLocation, useNavigate } from 'react-router'
+import { Navigate, useLocation } from 'react-router'
 import { distanceClass } from '../config/distances'
 import { persona } from '../config/personas'
 import { classLockStatus } from '../domain/classLock'
@@ -6,12 +6,10 @@ import { todayIso, weekdayLabel, WEEKDAYS } from '../domain/dates'
 import { formatPace } from '../domain/pace'
 import { useProfile } from '../profile/profileContext'
 import { Avatar } from '../ui/Avatar'
-import { Button } from '../ui/Button'
 import { Notice } from '../ui/Notice'
 
 export function HomePage() {
-  const { profile, deleteProfile } = useProfile()
-  const navigate = useNavigate()
+  const { profile } = useProfile()
   const location = useLocation()
   const saveFailed = (location.state as { saveFailed?: boolean } | null)?.saveFailed === true
 
@@ -23,15 +21,6 @@ export function HomePage() {
   const days = profile.runDays
     .map((id) => WEEKDAYS.find((d) => d.id === id)?.short ?? id)
     .join(', ')
-
-  function startOver() {
-    const ok = window.confirm(
-      'Delete your profile and start again? This removes your answers from this browser and can’t be undone.',
-    )
-    if (!ok) return
-    deleteProfile()
-    navigate('/onboarding', { replace: true })
-  }
 
   return (
     <section className="flex flex-col gap-8">
@@ -72,12 +61,6 @@ export function HomePage() {
           </dd>
         </div>
       </dl>
-
-      <div>
-        <Button variant="ghost" className="px-0" onClick={startOver}>
-          Start over
-        </Button>
-      </div>
     </section>
   )
 }

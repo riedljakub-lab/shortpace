@@ -1,6 +1,7 @@
 import type { MouseEvent } from 'react'
 import { Link, NavLink, Outlet } from 'react-router'
 import { Logo } from '../ui/Logo'
+import { GearIcon } from '../ui/icons'
 import { ThemeToggle } from '../ui/ThemeToggle'
 import { NAV_ITEMS } from './navItems'
 
@@ -53,7 +54,22 @@ export function AppShell({ showNav = true }: { showNav?: boolean }) {
             </nav>
           ) : null}
 
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            {/* Settings is always reachable, even during onboarding (e.g. to import a backup). */}
+            <NavLink
+              to="/settings"
+              aria-label="Settings"
+              title="Settings"
+              className={({ isActive }) =>
+                `flex size-10 items-center justify-center rounded-full ${
+                  isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:text-ink'
+                }`
+              }
+            >
+              <GearIcon />
+            </NavLink>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

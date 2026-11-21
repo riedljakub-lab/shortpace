@@ -3,11 +3,11 @@ import {
   draftToProfile,
   INITIAL_DRAFT,
   isComplete,
-  parseKm,
   STEP_IDS,
   validateStep,
   type OnboardingDraft,
 } from './draft'
+import { parseKm } from '../../domain/pace'
 
 const COMPLETE: OnboardingDraft = {
   avatarId: 'look-2',

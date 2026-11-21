@@ -45,3 +45,14 @@ export function paceFromTime(timeSec: number, km: number): number {
   if (km <= 0) throw new Error('Distance must be more than 0 km')
   return timeSec / km
 }
+
+/** "8", "8.5" or "8,5" → 8.5 km. Up to 2 decimals. Anything else → null. */
+export function parseKm(text: string): number | null {
+  const normalized = text.trim().replace(',', '.')
+  return /^\d{1,3}(\.\d{1,2})?$/.test(normalized) ? Number(normalized) : null
+}
+
+/** 8 → "8", 8.5 → "8.5", 10.25 → "10.25". */
+export function formatKm(km: number): string {
+  return String(Math.round(km * 100) / 100)
+}

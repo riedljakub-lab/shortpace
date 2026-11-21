@@ -1,18 +1,21 @@
 /*
  * THE storage module. Every read/write of saved data goes through here, so we can
  * swap localStorage for Supabase later without touching any screen.
- * So far: theme preference (M1) and profile (M2). Runs etc. come later.
+ * Holds: theme preference (M1), profile (M2), runs (M4).
  */
-import type { Profile } from '../domain/types'
+import type { Profile, Run } from '../domain/types'
 import { isThemePreference, type ThemePreference } from '../theme/theme'
 import { parseProfile } from './profileSchema'
+import { parseRuns, sortRunsNewestFirst } from './runSchema'
 
 export const STORAGE_PREFIX = 'shortpace:'
 /** Also read by the small script in index.html (prevents a white flash in dark mode). */
 export const THEME_KEY = `${STORAGE_PREFIX}theme`
 export const PROFILE_KEY = `${STORAGE_PREFIX}profile`
+export const RUNS_KEY = `${STORAGE_PREFIX}runs`
 /** Bump when the saved shape changes, and add a migration for the old version. */
 export const PROFILE_VERSION = 1
+export const RUNS_VERSION = 1
 
 /** The methods we need from localStorage. Tests pass a fake one. */
 export interface KeyValueStore {
@@ -31,6 +34,13 @@ export interface ProfileRepository {
   /** Returns false if the browser refused to save (e.g. private mode, storage full). */
   saveProfile(profile: Profile): boolean
   deleteProfile(): void
+}
+
+export interface RunRepository {
+  /** Newest first. Invalid entries are skipped, never crash the app. */
+  listRuns(): Run[]
+  /** Replaces the whole list (used by add, delete and import). False if the browser refused. */
+  saveRuns(runs: readonly Run[]): boolean
 }
 
 /*
@@ -92,6 +102,32 @@ export function createProfileRepository(store: KeyValueStore | null): ProfileRep
   }
 }
 
+export function createRunRepository(store: KeyValueStore | null): RunRepository {
+  return {
+    listRuns() {
+      try {
+        const raw = store?.getItem(RUNS_KEY)
+        if (!raw) return []
+        const saved: unknown = JSON.parse(raw)
+        if (typeof saved !== 'object' || saved === null) return []
+        const { version, runs } = saved as { version?: unknown; runs?: unknown }
+        return version === RUNS_VERSION ? sortRunsNewestFirst(parseRuns(runs).runs) : []
+      } catch {
+        return []
+      }
+    },
+    saveRuns(runs) {
+      try {
+        if (!store) return false
+        store.setItem(RUNS_KEY, JSON.stringify({ version: RUNS_VERSION, runs }))
+        return true
+      } catch {
+        return false
+      }
+    },
+  }
+}
+
 function browserStore(): KeyValueStore | null {
   try {
     return window.localStorage
@@ -102,3 +138,4 @@ function browserStore(): KeyValueStore | null {
 
 export const preferences = createPreferencesRepository(browserStore())
 export const profiles = createProfileRepository(browserStore())
+export const runLog = createRunRepository(browserStore())
