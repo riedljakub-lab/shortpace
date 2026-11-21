@@ -52,3 +52,26 @@ export function formatShortDate(iso: string): string {
     month: 'short',
   }).format(new Date(y, m - 1, d))
 }
+
+function toUtc(iso: string): Date {
+  const [y, m, d] = iso.split('-').map(Number) as [number, number, number]
+  return new Date(Date.UTC(y, m - 1, d))
+}
+
+/** "2026-11-30" + 2 → "2026-12-02". */
+export function addDays(iso: string, days: number): string {
+  const date = toUtc(iso)
+  date.setUTCDate(date.getUTCDate() + days)
+  return date.toISOString().slice(0, 10)
+}
+
+/** Which weekday a date falls on. */
+export function weekdayOf(iso: string): Weekday {
+  const jsDay = toUtc(iso).getUTCDay() // 0 = Sunday
+  return WEEKDAY_IDS[(jsDay + 6) % 7] ?? 'mon'
+}
+
+/** The Monday of the week a date is in (weeks run Monday → Sunday). */
+export function mondayOf(iso: string): string {
+  return addDays(iso, -WEEKDAY_IDS.indexOf(weekdayOf(iso)))
+}

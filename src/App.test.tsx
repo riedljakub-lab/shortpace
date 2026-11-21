@@ -115,7 +115,7 @@ describe('App', () => {
     const [planLink] = screen.getAllByRole('link', { name: 'Plan' })
     if (!planLink) throw new Error('Plan link not found')
     fireEvent.click(planLink)
-    expect(heading('Plan')).toBeInTheDocument()
+    expect(heading('Your plan')).toBeInTheDocument()
   })
 })
 
