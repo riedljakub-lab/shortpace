@@ -42,6 +42,11 @@ const PAIRS: [string, string, number][] = [
   ['warning', 'warning-soft', 4.5],
   ['danger', 'canvas', 4.5],
   ['success', 'canvas', 4.5],
+  ['ink', 'accent-soft', 4.5],
+  ['ink', 'warning-soft', 4.5],
+  // Form controls (input borders, choice cards) need 3:1 against what's around them.
+  ['control', 'canvas', 3],
+  ['control', 'surface', 3],
 ]
 
 const THEMES = {

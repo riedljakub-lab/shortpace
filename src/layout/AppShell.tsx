@@ -10,8 +10,11 @@ function skipToContent(event: MouseEvent<HTMLAnchorElement>) {
   document.getElementById('main')?.focus()
 }
 
-/** Layout for every page: header, page content (<Outlet />), and mobile bottom nav. */
-export function AppShell() {
+/**
+ * Layout for every page: header, page content (<Outlet />), and mobile bottom nav.
+ * `showNav={false}` is for focused flows like onboarding (logo + theme toggle only).
+ */
+export function AppShell({ showNav = true }: { showNav?: boolean }) {
   return (
     <div className="flex min-h-svh flex-col">
       <a
@@ -28,25 +31,27 @@ export function AppShell() {
             <Logo />
           </Link>
 
-          <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex gap-1">
-              {NAV_ITEMS.map(({ to, label }) => (
-                <li key={to}>
-                  <NavLink
-                    to={to}
-                    end={to === '/'}
-                    className={({ isActive }) =>
-                      `block rounded-md px-3 py-2 text-sm font-medium ${
-                        isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:text-ink'
-                      }`
-                    }
-                  >
-                    {label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {showNav ? (
+            <nav aria-label="Main" className="hidden md:block">
+              <ul className="flex gap-1">
+                {NAV_ITEMS.map(({ to, label }) => (
+                  <li key={to}>
+                    <NavLink
+                      to={to}
+                      end={to === '/'}
+                      className={({ isActive }) =>
+                        `block rounded-md px-3 py-2 text-sm font-medium ${
+                          isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:text-ink'
+                        }`
+                      }
+                    >
+                      {label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
 
           <ThemeToggle />
         </div>
@@ -55,35 +60,37 @@ export function AppShell() {
       <main
         id="main"
         tabIndex={-1}
-        className="mx-auto w-full max-w-5xl flex-1 px-4 pt-8 pb-28 outline-none md:pb-12"
+        className={`mx-auto w-full max-w-5xl flex-1 px-4 pt-8 outline-none md:pb-12 ${showNav ? 'pb-28' : 'pb-12'}`}
       >
         <Outlet />
       </main>
 
       {/* Phones: thumb-friendly tab bar at the bottom. Hidden from md (768px) up. */}
-      <nav
-        aria-label="Main"
-        className="fixed inset-x-0 bottom-0 border-t border-line bg-canvas pb-[env(safe-area-inset-bottom)] md:hidden"
-      >
-        <ul className="mx-auto grid max-w-md grid-cols-4">
-          {NAV_ITEMS.map(({ to, label, Icon }) => (
-            <li key={to}>
-              <NavLink
-                to={to}
-                end={to === '/'}
-                className={({ isActive }) =>
-                  `flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs font-medium ${
-                    isActive ? 'text-accent' : 'text-muted hover:text-ink'
-                  }`
-                }
-              >
-                <Icon width={22} height={22} />
-                {label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      {showNav ? (
+        <nav
+          aria-label="Main"
+          className="fixed inset-x-0 bottom-0 border-t border-line bg-canvas pb-[env(safe-area-inset-bottom)] md:hidden"
+        >
+          <ul className="mx-auto grid max-w-md grid-cols-4">
+            {NAV_ITEMS.map(({ to, label, Icon }) => (
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  end={to === '/'}
+                  className={({ isActive }) =>
+                    `flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs font-medium ${
+                      isActive ? 'text-accent' : 'text-muted hover:text-ink'
+                    }`
+                  }
+                >
+                  <Icon width={22} height={22} />
+                  {label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
     </div>
   )
 }
