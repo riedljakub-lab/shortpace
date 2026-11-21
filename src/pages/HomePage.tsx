@@ -5,9 +5,13 @@ import { classLockStatus } from '../domain/classLock'
 import { todayIso, weekdayLabel, WEEKDAYS } from '../domain/dates'
 import { formatPace } from '../domain/pace'
 import { longestRecentKm } from '../domain/history'
+import { SPLIT_FROM_LEVEL } from '../config/levels'
+import { progression } from '../domain/levels'
 import { generateWeekPlan } from '../domain/plan'
 import { sessionTarget } from '../features/plan/sessionText'
 import { RestDayAlert } from '../features/guard/GuardNotice'
+import { LevelUpGate } from '../features/progress/LevelUpGate'
+import { ProgressCard } from '../features/progress/ProgressCard'
 import { useProfile } from '../profile/profileContext'
 import { useRuns } from '../runs/runsContext'
 import { Avatar } from '../ui/Avatar'
@@ -30,6 +34,7 @@ export function HomePage() {
     weekOf: today,
     longestRecentKm: longestRecentKm({ profile, runs, onDate: today }),
   }).days.find((d) => d.date === today)?.session
+  const progress = progression(profile, runs, today)
   const days = profile.runDays
     .map((id) => WEEKDAYS.find((d) => d.id === id)?.short ?? id)
     .join(', ')
@@ -43,10 +48,18 @@ export function HomePage() {
         </Notice>
       ) : null}
 
+      <LevelUpGate level={progress.level} />
+
       <RestDayAlert />
 
       <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
-        <Avatar avatarId={profile.avatarId} className="h-56 w-auto shrink-0" />
+        <Avatar
+          avatarId={profile.avatarId}
+          inseamCm={progress.rung.inseamCm}
+          cargoPocket={progress.level === 1 || progress.regress !== null}
+          split={progress.level >= SPLIT_FROM_LEVEL}
+          className="h-56 w-auto shrink-0"
+        />
         <div className="flex flex-col gap-2 text-center sm:text-left">
           <p className="text-sm font-medium text-muted">{persona(profile.persona).name}</p>
           <h1 className="text-3xl font-bold tracking-tight">Training for the {cls.label}</h1>
@@ -79,6 +92,8 @@ export function HomePage() {
           </Link>
         </section>
       ) : null}
+
+      <ProgressCard progress={progress} />
 
       <dl className="grid gap-4 rounded-xl bg-surface p-5 sm:grid-cols-3">
         <div>

@@ -56,6 +56,19 @@ describe('preferences repository: theme', () => {
   })
 })
 
+describe('preferences repository: last seen level', () => {
+  it('remembers the last celebrated level and ignores garbage', () => {
+    const store = memoryStore()
+    const repo = createPreferencesRepository(store)
+    expect(repo.getLastSeenLevel()).toBeNull()
+    repo.setLastSeenLevel(3)
+    expect(repo.getLastSeenLevel()).toBe(3)
+    store.setItem('shortpace:lastSeenLevel', '42')
+    expect(repo.getLastSeenLevel()).toBeNull()
+    expect(createPreferencesRepository(brokenStore).getLastSeenLevel()).toBeNull()
+  })
+})
+
 describe('profile repository', () => {
   it('returns null before onboarding', () => {
     expect(createProfileRepository(memoryStore()).getProfile()).toBeNull()

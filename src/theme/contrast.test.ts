@@ -38,6 +38,7 @@ const PAIRS: [string, string, number][] = [
   ['accent', 'accent-soft', 4.5],
   ['on-accent', 'accent', 4.5],
   ['on-accent', 'accent-hover', 4.5],
+  ['on-accent', 'success', 4.5], // check marks in the level checklist
   ['warning', 'canvas', 4.5],
   ['warning', 'warning-soft', 4.5],
   ['danger', 'canvas', 4.5],

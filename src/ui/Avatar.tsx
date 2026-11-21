@@ -82,8 +82,10 @@ export interface AvatarProps {
   /** Shorts inseam in cm. Default 30 = level 1 cargo shorts. */
   inseamCm?: number
   shortsColor?: string
-  /** Defaults to on for long (cargo-length) shorts. */
+  /** Defaults to on for long (cargo-length) shorts. Also shown while regressing. */
   cargoPocket?: boolean
+  /** Side split at the hem (split shorts and shorter). */
+  split?: boolean
   className?: string
   /** Set when a visible text label already describes the avatar. */
   decorative?: boolean
@@ -94,6 +96,7 @@ export function Avatar({
   inseamCm = 30,
   shortsColor = '#334155',
   cargoPocket,
+  split = false,
   className,
   decorative = false,
 }: AvatarProps) {
@@ -103,6 +106,10 @@ export function Avatar({
   const crotch = 136
   const hem = crotch + Math.max(1, inseamCm) * PX_PER_CM
   const showPocket = cargoPocket ?? inseamCm >= 25
+  // The pocket shrinks to fit, so it can appear on short shorts too (regress).
+  const pocketHeight = Math.min(11, hem - 132.5)
+  const outerLeft = 60 - hip - 3
+  const outerRight = 60 + hip + 3
 
   return (
     <svg
@@ -181,10 +188,27 @@ export function Avatar({
         strokeWidth="2"
       />
       <path d={`M${60 - hip - 1} 128.5 H${60 + hip + 1}`} stroke={OUTLINE} strokeWidth="1.5" />
-      {showPocket && hem - 18 > crotch ? (
+      {showPocket && pocketHeight >= 4 ? (
         <g stroke={OUTLINE} strokeWidth="1.5">
-          <rect x={60 - hip - 1} y={hem - 17} width="9" height="11" rx="1.5" />
-          <path d={`M${60 - hip - 1} ${hem - 13} h9`} />
+          <rect
+            x={60 - hip - 1}
+            y={hem - 2 - pocketHeight}
+            width="9"
+            height={pocketHeight}
+            rx="1.5"
+          />
+          <path d={`M${60 - hip - 1} ${hem - 2 - pocketHeight * 0.65} h9`} />
+        </g>
+      ) : null}
+      {split ? (
+        // Little V-shaped side splits at the outer hem.
+        <g fill={look.skin} stroke={OUTLINE} strokeWidth="1.2" strokeLinejoin="round">
+          <path
+            d={`M${outerLeft} ${hem} L${outerLeft + 3.5} ${hem} L${outerLeft + 1.2} ${hem - 4} Z`}
+          />
+          <path
+            d={`M${outerRight} ${hem} L${outerRight - 3.5} ${hem} L${outerRight - 1.2} ${hem - 4} Z`}
+          />
         </g>
       ) : null}
 
