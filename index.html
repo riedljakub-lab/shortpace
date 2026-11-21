@@ -7,7 +7,21 @@
       name="description"
       content="ShortPace: shorter shorts, faster pace. A gamified running app."
     />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <title>ShortPace</title>
+    <script>
+      // Pick the theme before the first paint, so dark mode never flashes white.
+      // The key must match THEME_KEY in src/storage/storage.ts.
+      ;(function () {
+        try {
+          var pref = localStorage.getItem('shortpace:theme')
+          var dark =
+            pref === 'dark' ||
+            (pref !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

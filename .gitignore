@@ -13,7 +13,7 @@ coverage/
 private/
 
 # Local Claude Code settings
-.claude/settings.local.json
+.claude/
 
 # OS / editor junk
 .DS_Store

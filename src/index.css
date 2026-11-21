@@ -1,1 +1,94 @@
 @import 'tailwindcss';
+
+/*
+ * DESIGN TOKENS
+ * Every color in the app comes from these variables. Components use semantic names
+ * (bg-canvas, text-muted, bg-accent...), never raw hex, so dark mode is just a
+ * different set of values. src/theme/contrast.test.ts checks WCAG AA for the pairs.
+ */
+
+/* Light theme (default) */
+:root {
+  --sp-canvas: #ffffff; /* page background */
+  --sp-surface: #f4f6fa; /* cards, header, nav */
+  --sp-ink: #0f172a; /* main text */
+  --sp-muted: #475569; /* secondary text */
+  --sp-line: #dde3ec; /* decorative borders */
+  --sp-accent: #0047ab; /* cobalt: links, primary buttons, focus ring */
+  --sp-accent-hover: #003a8c;
+  --sp-on-accent: #ffffff; /* text on accent backgrounds */
+  --sp-accent-soft: #e6eefa; /* subtle accent backgrounds (active nav, chips) */
+  --sp-warning: #8a4b00;
+  --sp-warning-soft: #fff4e0;
+  --sp-danger: #b42318;
+  --sp-success: #1f7a3d;
+  color-scheme: light;
+}
+
+/* Dark theme: set by src/theme (data-theme="dark" on <html>) */
+:root[data-theme='dark'] {
+  --sp-canvas: #0b1120;
+  --sp-surface: #131b2e;
+  --sp-ink: #e5e9f0;
+  --sp-muted: #9aa6b8;
+  --sp-line: #24304a;
+  --sp-accent: #6e9cff;
+  --sp-accent-hover: #8db1ff;
+  --sp-on-accent: #0b1120;
+  --sp-accent-soft: #16264a;
+  --sp-warning: #f5b54a;
+  --sp-warning-soft: #2e2210;
+  --sp-danger: #ff8a80;
+  --sp-success: #5fd38a;
+  color-scheme: dark;
+}
+
+/* Expose the tokens to Tailwind as utilities: bg-canvas, text-ink, border-line, ... */
+@theme inline {
+  --color-canvas: var(--sp-canvas);
+  --color-surface: var(--sp-surface);
+  --color-ink: var(--sp-ink);
+  --color-muted: var(--sp-muted);
+  --color-line: var(--sp-line);
+  --color-accent: var(--sp-accent);
+  --color-accent-hover: var(--sp-accent-hover);
+  --color-on-accent: var(--sp-on-accent);
+  --color-accent-soft: var(--sp-accent-soft);
+  --color-warning: var(--sp-warning);
+  --color-warning-soft: var(--sp-warning-soft);
+  --color-danger: var(--sp-danger);
+  --color-success: var(--sp-success);
+}
+
+/* Type: system fonts (fast, no download). Scale = Tailwind's text-sm/base/lg/xl/2xl/4xl. */
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--sp-canvas);
+    color: var(--sp-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Visible focus for keyboard users only (not on mouse click). */
+  :focus-visible {
+    outline: 3px solid var(--sp-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* Respect "reduce motion": no animations or smooth scrolling anywhere. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
