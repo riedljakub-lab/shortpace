@@ -95,10 +95,18 @@ function qualityCount(novice: boolean, runs: number): number {
   return runs >= 4 ? R.qualityPerWeek.experienced4PlusRuns : R.qualityPerWeek.experiencedUpTo3Runs
 }
 
-/** Long run target: at most +10% on the recent longest run, rounded down to 0.5 km. */
+/**
+ * Long run target: at most +10% on the recent longest run, rounded down to 0.5 km,
+ * so the plan never trips the spike guard. The minimum only applies to a fresh start
+ * (no runs at all in 30 days), where there is nothing to grow from.
+ */
 export function longRunTargetKm(p: PlanProfile, longestRecentKm: number): number {
+  const cap = R.longRunCapKm[p.distanceClass]
+  if (longestRecentKm <= 0) return Math.min(cap, R.minLongRunKm)
   const grown = Math.floor(longestRecentKm * (1 + R.longRunGrowth) * 2) / 2
-  return Math.min(R.longRunCapKm[p.distanceClass], Math.max(R.minLongRunKm, grown))
+  // Very short history (e.g. 0.3 km): don't round down below what they already ran.
+  const atLeast = Math.floor(longestRecentKm * 10) / 10
+  return Math.min(cap, Math.max(grown, atLeast))
 }
 
 export function generateWeekPlan(input: {

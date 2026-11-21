@@ -2,17 +2,27 @@ import { useState } from 'react'
 import { Navigate } from 'react-router'
 import { PLAN_IS_DRAFT } from '../../config/planRules'
 import { addDays, formatShortDate, mondayOf, todayIso, weekdayLabel } from '../../domain/dates'
+import { checkSpike, spikeMessage, type GuardMessage } from '../../domain/guard'
 import { longestRecentKm } from '../../domain/history'
 import { baseWeeksFor, generateWeekPlan, type DayPlan } from '../../domain/plan'
 import { useProfile } from '../../profile/profileContext'
 import { useRuns } from '../../runs/runsContext'
 import { Button } from '../../ui/Button'
+import { GuardNotice, RestDayAlert } from '../guard/GuardNotice'
 import { sessionTarget } from './sessionText'
 
 /** How far ahead you can look. */
 const MAX_WEEKS_AHEAD = 4
 
-function DayCard({ day, isToday }: { day: DayPlan; isToday: boolean }) {
+function DayCard({
+  day,
+  isToday,
+  warning,
+}: {
+  day: DayPlan
+  isToday: boolean
+  warning: GuardMessage | null
+}) {
   const { session } = day
   const target = sessionTarget(session)
   const rest = session.kind === 'rest'
@@ -51,6 +61,11 @@ function DayCard({ day, isToday }: { day: DayPlan; isToday: boolean }) {
           ) : null}
         </p>
         <p className="text-sm text-muted">{session.detail}</p>
+        {warning ? (
+          <div className="mt-2">
+            <GuardNotice message={warning} />
+          </div>
+        ) : null}
       </div>
     </li>
   )
@@ -65,11 +80,21 @@ export function PlanPage() {
 
   const today = todayIso()
   const weekOf = addDays(mondayOf(today), weeksAhead * 7)
-  const plan = generateWeekPlan({
+  const recentLongest = longestRecentKm({
     profile,
-    weekOf,
-    longestRecentKm: longestRecentKm({ profile, runs, onDate: weeksAhead === 0 ? today : weekOf }),
+    runs,
+    onDate: weeksAhead === 0 ? today : weekOf,
   })
+  const plan = generateWeekPlan({ profile, weekOf, longestRecentKm: recentLongest })
+  // Spike guard on planned runs too (rare: the generator already stays within +10%).
+  const warningFor = (day: DayPlan) =>
+    day.session.targetKm === undefined
+      ? null
+      : spikeMessage(
+          day.session.targetKm,
+          checkSpike(day.session.targetKm, recentLongest),
+          'planned',
+        )
   const firstDay = plan.days[0]?.date ?? weekOf
   const lastDay = plan.days[6]?.date ?? weekOf
   const buildStartsInWeek = baseWeeksFor(profile) + 1
@@ -84,6 +109,8 @@ export function PlanPage() {
           </p>
         ) : null}
       </div>
+
+      <RestDayAlert />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -123,7 +150,7 @@ export function PlanPage() {
 
       <ol aria-label={`Week ${plan.weekNumber} sessions`} className="flex flex-col gap-3">
         {plan.days.map((day) => (
-          <DayCard key={day.day} day={day} isToday={day.date === today} />
+          <DayCard key={day.day} day={day} isToday={day.date === today} warning={warningFor(day)} />
         ))}
       </ol>
     </div>
