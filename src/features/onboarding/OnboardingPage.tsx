@@ -15,6 +15,7 @@ import {
 import type { StepProps } from './stepProps'
 import { AboutStep } from './steps/AboutStep'
 import { AvatarStep } from './steps/AvatarStep'
+import { CheckStep } from './steps/CheckStep'
 import { ClassStep } from './steps/ClassStep'
 import { FitnessStep } from './steps/FitnessStep'
 import { GoalStep } from './steps/GoalStep'
@@ -48,6 +49,11 @@ const STEPS: Record<
     Component: FitnessStep,
   },
   goal: { title: 'Set your goal pace', Component: GoalStep },
+  check: {
+    title: 'Reality check',
+    intro: 'How your goal compares with your current fitness. Nothing here blocks you.',
+    Component: CheckStep,
+  },
 }
 
 export function OnboardingPage() {

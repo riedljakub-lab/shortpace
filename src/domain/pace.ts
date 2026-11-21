@@ -34,3 +34,14 @@ export function formatDuration(totalSec: number): string {
   const ss = String(s).padStart(2, '0')
   return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`
 }
+
+/** Finish time for a distance at a given pace: 300 s/km over 10 km → 3000 s. */
+export function timeFromPace(secPerKm: number, km: number): number {
+  return secPerKm * km
+}
+
+/** Average pace for a time over a distance: 3000 s over 10 km → 300 s/km. */
+export function paceFromTime(timeSec: number, km: number): number {
+  if (km <= 0) throw new Error('Distance must be more than 0 km')
+  return timeSec / km
+}

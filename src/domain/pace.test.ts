@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { formatDuration, formatPace, parseDuration, parsePace } from './pace'
+import {
+  formatDuration,
+  formatPace,
+  paceFromTime,
+  parseDuration,
+  parsePace,
+  timeFromPace,
+} from './pace'
 
 describe('parsePace', () => {
   it('reads m:ss into seconds per km', () => {
@@ -46,5 +53,17 @@ describe('formatDuration', () => {
     expect(formatDuration(1530)).toBe('25:30')
     expect(formatDuration(3930)).toBe('1:05:30')
     expect(formatDuration(3600)).toBe('1:00:00')
+  })
+})
+
+describe('timeFromPace / paceFromTime', () => {
+  it('converts between pace and finish time', () => {
+    expect(timeFromPace(300, 10)).toBe(3000)
+    expect(paceFromTime(3000, 10)).toBe(300)
+    expect(formatDuration(timeFromPace(parsePace('5:00') ?? 0, 21.0975))).toBe('1:45:29')
+  })
+
+  it('refuses a zero distance', () => {
+    expect(() => paceFromTime(100, 0)).toThrow()
   })
 })
