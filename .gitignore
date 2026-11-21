@@ -1,0 +1,23 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Secrets: never commit these
+.env
+.env.*
+!.env.example
+*.local
+
+# Your real personal data (e.g. Garmin exports) stays on your machine only
+private/
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# OS / editor junk
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.log
