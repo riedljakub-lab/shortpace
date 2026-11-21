@@ -16,6 +16,7 @@ export const STEP_IDS = [
   'schedule',
   'fitness',
   'goal',
+  'check',
 ] as const
 export type StepId = (typeof STEP_IDS)[number]
 
@@ -138,6 +139,9 @@ export function validateStep(step: StepId, d: OnboardingDraft): DraftErrors {
       if (err) e.goalPace = err
       break
     }
+    case 'check':
+      // The reality check only informs. It never blocks.
+      break
   }
   return e
 }

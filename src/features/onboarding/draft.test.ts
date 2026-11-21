@@ -30,10 +30,14 @@ const COMPLETE: OnboardingDraft = {
 }
 
 describe('validateStep', () => {
-  it('blocks every step of an empty draft', () => {
-    for (const step of STEP_IDS) {
+  it('blocks every question step of an empty draft', () => {
+    for (const step of STEP_IDS.filter((id) => id !== 'check')) {
       expect(Object.keys(validateStep(step, INITIAL_DRAFT)).length, step).toBeGreaterThan(0)
     }
+  })
+
+  it('never blocks on the reality check (it only informs)', () => {
+    expect(validateStep('check', INITIAL_DRAFT)).toEqual({})
   })
 
   it('passes every step of a complete draft', () => {
