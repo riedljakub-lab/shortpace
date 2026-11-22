@@ -14,12 +14,16 @@ import { LevelUpGate } from '../features/progress/LevelUpGate'
 import { ProgressCard } from '../features/progress/ProgressCard'
 import { useProfile } from '../profile/profileContext'
 import { useRuns } from '../runs/runsContext'
+import { shortsStyle } from '../config/cosmetics'
+import { coinBalance } from '../domain/wallet'
+import { useWallet } from '../wallet/walletContext'
 import { Avatar } from '../ui/Avatar'
 import { Notice } from '../ui/Notice'
 
 export function HomePage() {
   const { profile } = useProfile()
   const { runs } = useRuns()
+  const { wallet } = useWallet()
   const location = useLocation()
   const saveFailed = (location.state as { saveFailed?: boolean } | null)?.saveFailed === true
 
@@ -35,6 +39,7 @@ export function HomePage() {
     longestRecentKm: longestRecentKm({ profile, runs, onDate: today }),
   }).days.find((d) => d.date === today)?.session
   const progress = progression(profile, runs, today)
+  const shorts = shortsStyle(wallet.equippedShorts)
   const days = profile.runDays
     .map((id) => WEEKDAYS.find((d) => d.id === id)?.short ?? id)
     .join(', ')
@@ -58,6 +63,8 @@ export function HomePage() {
           inseamCm={progress.rung.inseamCm}
           cargoPocket={progress.level === 1 || progress.regress !== null}
           split={progress.level >= SPLIT_FROM_LEVEL}
+          shortsColor={shorts.color}
+          shortsPattern={shorts.pattern}
           className="h-56 w-auto shrink-0"
         />
         <div className="flex flex-col gap-2 text-center sm:text-left">
@@ -93,7 +100,7 @@ export function HomePage() {
         </section>
       ) : null}
 
-      <ProgressCard progress={progress} />
+      <ProgressCard progress={progress} coinBalance={coinBalance(progress.coins, wallet)} />
 
       <dl className="grid gap-4 rounded-xl bg-surface p-5 sm:grid-cols-3">
         <div>

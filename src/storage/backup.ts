@@ -1,9 +1,11 @@
 // JSON export/import of ALL app data: one file you can keep as a backup or move to another device.
 import { todayIso } from '../domain/dates'
 import type { Profile, Run } from '../domain/types'
+import type { Wallet } from '../domain/wallet'
 import { isThemePreference, type ThemePreference } from '../theme/theme'
 import { parseProfile } from './profileSchema'
 import { parseRuns, sortRunsNewestFirst } from './runSchema'
+import { parseWallet } from './walletSchema'
 
 export const BACKUP_APP = 'shortpace'
 /** Bump when the backup shape changes; older backups then need a migration. */
@@ -13,6 +15,8 @@ export interface AppData {
   profile: Profile | null
   runs: Run[]
   theme: ThemePreference
+  /** Shop purchases. Older backups have none: they import with an empty wallet. */
+  wallet: Wallet
 }
 
 export interface Backup extends AppData {
@@ -70,6 +74,7 @@ export function parseBackup(text: string): ImportResult {
       profile,
       runs: sortRunsNewestFirst(runs),
       theme: isThemePreference(b.theme) ? b.theme : 'system',
+      wallet: parseWallet(b.wallet),
     },
     exportedAt: typeof b.exportedAt === 'string' ? b.exportedAt : '',
     skippedRuns: invalid,

@@ -1,9 +1,17 @@
+import { Link } from 'react-router'
 import { regressMessage, type Progression } from '../../domain/levels'
 import { formatKm } from '../../domain/pace'
 import { Notice } from '../../ui/Notice'
 
 /** Current shorts, XP, coins, and exactly what the next level needs. */
-export function ProgressCard({ progress }: { progress: Progression }) {
+export function ProgressCard({
+  progress,
+  coinBalance,
+}: {
+  progress: Progression
+  /** Earned coins minus what you've spent in the shop. */
+  coinBalance: number
+}) {
   const { rung, next, regress } = progress
   return (
     <section
@@ -24,7 +32,15 @@ export function ProgressCard({ progress }: { progress: Progression }) {
         </div>
         <div>
           <dt className="text-sm text-muted">Coins</dt>
-          <dd className="text-2xl font-bold tabular-nums">{progress.coins}</dd>
+          <dd className="flex flex-wrap items-baseline gap-x-3">
+            <span className="text-2xl font-bold tabular-nums">{coinBalance}</span>
+            <Link
+              to="/shop"
+              className="text-sm font-semibold text-accent underline-offset-4 hover:underline"
+            >
+              Shop
+            </Link>
+          </dd>
         </div>
       </dl>
 

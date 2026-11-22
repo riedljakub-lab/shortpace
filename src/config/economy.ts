@@ -23,3 +23,9 @@ export const EARNINGS = {
     maxStreakBonus: 25,
   },
 } as const
+
+/**
+ * Switching distance class after the 30-day lock costs coins. PLACEHOLDER.
+ * Coins can never skip the lock, a safety warning or a rest day.
+ */
+export const CLASS_SWITCH_COST = 100
