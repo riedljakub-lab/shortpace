@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { HashRouter, Route, Routes } from 'react-router'
+import { ImportPage } from './features/import/ImportPage'
 import { LogPage } from './features/log/LogPage'
 import { OnboardingPage } from './features/onboarding/OnboardingPage'
 import { PlanPage } from './features/plan/PlanPage'
@@ -34,6 +35,7 @@ export default function App() {
                   <Route index element={<HomePage />} />
                   <Route path="plan" element={<PlanPage />} />
                   <Route path="log" element={<LogPage />} />
+                  <Route path="import" element={<ImportPage />} />
                   <Route
                     path="dashboard"
                     element={

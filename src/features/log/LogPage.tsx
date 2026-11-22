@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { flushSync } from 'react-dom'
+import { Link } from 'react-router'
 import { RUN_TYPES } from '../../config/runTypes'
 import { formatShortDate, isIsoDate, todayIso } from '../../domain/dates'
 import { checkSpike, spikeMessage, type GuardMessage } from '../../domain/guard'
@@ -117,9 +118,17 @@ export function LogPage() {
   return (
     <div className="flex flex-col gap-12">
       <section aria-labelledby="log-heading" className="flex flex-col gap-6">
-        <h1 id="log-heading" className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Log a run
-        </h1>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h1 id="log-heading" className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Log a run
+          </h1>
+          <Link
+            to="/import"
+            className="text-sm font-semibold text-accent underline-offset-4 hover:underline"
+          >
+            Import from Garmin (CSV)
+          </Link>
+        </div>
 
         <form ref={formRef} onSubmit={handleSubmit} noValidate className="flex flex-col gap-8">
           <div className="grid gap-4 sm:grid-cols-3">
