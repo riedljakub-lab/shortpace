@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { useProfile } from '../../profile/profileContext'
 import { useRuns } from '../../runs/runsContext'
 import { backupFileName, buildBackup, parseBackup, type ImportResult } from '../../storage/backup'
@@ -87,6 +87,16 @@ export function SettingsPage() {
         <p className="text-muted">
           Everything stays in this browser. Nothing is sent anywhere. Export a backup to keep it
           safe or to move to another device.
+        </p>
+        <p>
+          Runs in Garmin Connect?{' '}
+          <Link
+            to="/import"
+            className="font-semibold text-accent underline-offset-4 hover:underline"
+          >
+            Import them from a CSV export
+          </Link>
+          .
         </p>
 
         <div className="flex flex-wrap gap-3">
