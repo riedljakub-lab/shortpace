@@ -265,6 +265,8 @@ describe('longestRecentKm', () => {
     const p = { longestRunKm30d: 12, classChosenOn: '2026-11-10' }
     expect(longestRecentKm({ profile: p, runs, onDate: '2026-11-21' })).toBe(12)
     expect(longestRecentKm({ profile: p, runs: [], onDate: '2026-12-31' })).toBe(0)
+    // ...and not for dates before onboarding (e.g. imported old runs).
+    expect(longestRecentKm({ profile: p, runs: [], onDate: '2026-10-01' })).toBe(0)
   })
 })
 
