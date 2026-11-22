@@ -20,8 +20,11 @@ export function longestRecentKm(input: {
     .filter((r) => r.date >= from && r.date < input.onDate)
     .map((r) => r.distanceKm)
   const profile = input.profile
+  // The onboarding answer describes the 30 days before onboarding, so it only counts
+  // from the onboarding day until 30 days later (not for older, imported runs).
+  const sinceOnboarding = profile ? daysBetween(profile.classChosenOn, input.onDate) : -1
   const fromProfile =
-    profile && daysBetween(profile.classChosenOn, input.onDate) <= windowDays
+    profile && sinceOnboarding >= 0 && sinceOnboarding <= windowDays
       ? [profile.longestRunKm30d]
       : []
   return Math.max(0, ...fromRuns, ...fromProfile)
