@@ -4,6 +4,8 @@ import { useProfile } from '../../profile/profileContext'
 import { useRuns } from '../../runs/runsContext'
 import { backupFileName, buildBackup, parseBackup, type ImportResult } from '../../storage/backup'
 import { useTheme } from '../../theme/themeContext'
+import { EMPTY_WALLET } from '../../domain/wallet'
+import { useWallet } from '../../wallet/walletContext'
 import { Button } from '../../ui/Button'
 import { downloadTextFile } from '../../ui/download'
 import { Notice } from '../../ui/Notice'
@@ -25,13 +27,14 @@ export function SettingsPage() {
   const { profile, saveProfile, deleteProfile } = useProfile()
   const { runs, replaceRuns } = useRuns()
   const { preference, setPreference } = useTheme()
+  const { wallet, saveWallet } = useWallet()
   const navigate = useNavigate()
   const fileRef = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<ReadyImport | null>(null)
   const [message, setMessage] = useState<{ tone: 'info' | 'warning'; text: string } | null>(null)
 
   function handleExport() {
-    const backup = buildBackup({ profile, runs, theme: preference })
+    const backup = buildBackup({ profile, runs, theme: preference, wallet })
     downloadTextFile(backupFileName(), JSON.stringify(backup, null, 2))
     setMessage({ tone: 'info', text: `Backup downloaded with ${plural(runs.length, 'run')}.` })
   }
@@ -47,10 +50,16 @@ export function SettingsPage() {
 
   function applyImport() {
     if (!pending) return
-    const { profile: importedProfile, runs: importedRuns, theme } = pending.data
+    const {
+      profile: importedProfile,
+      runs: importedRuns,
+      theme,
+      wallet: importedWallet,
+    } = pending.data
     if (importedProfile) saveProfile(importedProfile)
     else deleteProfile()
     replaceRuns(importedRuns)
+    saveWallet(importedWallet)
     setPreference(theme)
     setPending(null)
     setMessage({ tone: 'info', text: `Imported ${plural(importedRuns.length, 'run')}.` })
@@ -58,10 +67,11 @@ export function SettingsPage() {
 
   function deleteAll() {
     const ok = window.confirm(
-      'Delete your profile and all runs from this browser? This can’t be undone. Export a backup first if you might want them back.',
+      'Delete your profile, all runs and shop purchases from this browser? This can’t be undone. Export a backup first if you might want them back.',
     )
     if (!ok) return
     replaceRuns([])
+    saveWallet(EMPTY_WALLET)
     deleteProfile()
     navigate('/onboarding', { replace: true })
   }
@@ -127,7 +137,9 @@ export function SettingsPage() {
         <h2 id="danger-heading" className="text-xl font-bold tracking-tight">
           Start over
         </h2>
-        <p className="text-muted">Deletes your profile and all runs from this browser.</p>
+        <p className="text-muted">
+          Deletes your profile, all runs and shop purchases from this browser.
+        </p>
         <div>
           <Button variant="secondary" className="border-danger text-danger" onClick={deleteAll}>
             Delete all data

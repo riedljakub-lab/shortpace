@@ -1,4 +1,6 @@
+import { useId } from 'react'
 import { avatar, type AvatarId, type Build, type HairStyle } from '../config/avatars'
+import type { ShortsPattern } from '../config/cosmetics'
 
 /*
  * Cartoon runner drawn in SVG. Everything comes from config/avatars.ts.
@@ -82,6 +84,8 @@ export interface AvatarProps {
   /** Shorts inseam in cm. Default 30 = level 1 cargo shorts. */
   inseamCm?: number
   shortsColor?: string
+  /** Cosmetic from the shop: plain, side racing stripe, or checkered. */
+  shortsPattern?: ShortsPattern
   /** Defaults to on for long (cargo-length) shorts. Also shown while regressing. */
   cargoPocket?: boolean
   /** Side split at the hem (split shorts and shorter). */
@@ -95,12 +99,14 @@ export function Avatar({
   avatarId,
   inseamCm = 30,
   shortsColor = '#334155',
+  shortsPattern = 'plain',
   cargoPocket,
   split = false,
   className,
   decorative = false,
 }: AvatarProps) {
   const look = avatar(avatarId)
+  const patternId = `checks-${useId().replace(/:/g, '')}`
   const sh = SHOULDER[look.build]
   const hip = HIP[look.build]
   const crotch = 136
@@ -180,13 +186,28 @@ export function Avatar({
       <Limb d={`M${60 - sh + 4} 77 L${60 - sh + 1} 90`} color={look.shirt} width={11} />
       <Limb d={`M${60 + sh - 4} 77 L${60 + sh - 1} 90`} color={look.shirt} width={11} />
 
-      {/* SHORTS: the only part that changes with level */}
+      {/* SHORTS: the only part that changes with level (length) or the shop (color/pattern) */}
+      {shortsPattern === 'checks' ? (
+        <defs>
+          <pattern id={patternId} width="6" height="6" patternUnits="userSpaceOnUse">
+            <rect width="6" height="6" fill="#f8fafc" />
+            <rect width="3" height="3" fill={shortsColor} />
+            <rect x="3" y="3" width="3" height="3" fill={shortsColor} />
+          </pattern>
+        </defs>
+      ) : null}
       <path
         d={`M${60 - hip - 1} 124 H${60 + hip + 1} L${60 + hip + 3} ${hem} H61.5 L60 ${crotch} L58.5 ${hem} H${60 - hip - 3} Z`}
-        fill={shortsColor}
+        fill={shortsPattern === 'checks' ? `url(#${patternId})` : shortsColor}
         stroke={OUTLINE}
         strokeWidth="2"
       />
+      {shortsPattern === 'stripe' ? (
+        <g stroke="#f8fafc" strokeWidth="2.5" strokeLinecap="round">
+          <path d={`M${60 - hip + 0.5} 130 L${60 - hip - 0.5} ${hem - 1}`} />
+          <path d={`M${60 + hip - 0.5} 130 L${60 + hip + 0.5} ${hem - 1}`} />
+        </g>
+      ) : null}
       <path d={`M${60 - hip - 1} 128.5 H${60 + hip + 1}`} stroke={OUTLINE} strokeWidth="1.5" />
       {showPocket && pocketHeight >= 4 ? (
         <g stroke={OUTLINE} strokeWidth="1.5">

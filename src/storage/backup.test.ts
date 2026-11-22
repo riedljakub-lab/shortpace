@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { SAMPLE_PROFILE, sampleRun } from '../test/fixtures'
 import { backupFileName, buildBackup, parseBackup, type AppData } from './backup'
+import { buyShorts, EMPTY_WALLET } from '../domain/wallet'
 
 const DATA: AppData = {
   profile: SAMPLE_PROFILE,
@@ -9,6 +10,7 @@ const DATA: AppData = {
     sampleRun({ id: 'a', date: '2026-11-18', avgHeartRate: 148, notes: 'Hills' }),
   ],
   theme: 'dark',
+  wallet: buyShorts(EMPTY_WALLET, 'volt', '2026-11-20', 'p1'),
 }
 const NOW = new Date('2026-11-21T10:00:00.000Z')
 
@@ -24,7 +26,9 @@ describe('backup export/import', () => {
   })
 
   it('works before onboarding (no profile yet)', () => {
-    const text = JSON.stringify(buildBackup({ profile: null, runs: [], theme: 'system' }, NOW))
+    const text = JSON.stringify(
+      buildBackup({ profile: null, runs: [], theme: 'system', wallet: EMPTY_WALLET }, NOW),
+    )
     const result = parseBackup(text)
     expect(result.ok && result.data.profile).toBeNull()
   })
@@ -65,5 +69,12 @@ describe('backup export/import', () => {
     expect(parseBackup(text).ok && (parseBackup(text) as { data: AppData }).data.theme).toBe(
       'system',
     )
+  })
+
+  it('imports older backups without a wallet as an empty wallet', () => {
+    const { wallet: _ignored, ...withoutWallet } = buildBackup(DATA, NOW)
+    void _ignored
+    const result = parseBackup(JSON.stringify(withoutWallet))
+    expect(result.ok && result.data.wallet).toEqual(EMPTY_WALLET)
   })
 })
