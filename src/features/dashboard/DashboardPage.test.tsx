@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../../App'
+// Load the lazily-loaded page up front, so its first render doesn't race the test's timeout.
+import './DashboardPage'
 import { addDays } from '../../domain/dates'
 import type { Profile, Run } from '../../domain/types'
 import { PROFILE_KEY, PROFILE_VERSION, RUNS_KEY } from '../../storage/storage'

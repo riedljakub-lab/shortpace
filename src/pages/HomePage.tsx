@@ -12,6 +12,7 @@ import { sessionTarget } from '../features/plan/sessionText'
 import { RestDayAlert } from '../features/guard/GuardNotice'
 import { LevelUpGate } from '../features/progress/LevelUpGate'
 import { ProgressCard } from '../features/progress/ProgressCard'
+import { RunnerTypeCard } from '../features/runnerType/RunnerTypeCard'
 import { useProfile } from '../profile/profileContext'
 import { useRuns } from '../runs/runsContext'
 import { shortsStyle } from '../config/cosmetics'
@@ -101,6 +102,8 @@ export function HomePage() {
       ) : null}
 
       <ProgressCard progress={progress} coinBalance={coinBalance(progress.coins, wallet)} />
+
+      <RunnerTypeCard runs={runs} persona={profile.persona} />
 
       <dl className="grid gap-4 rounded-xl bg-surface p-5 sm:grid-cols-3">
         <div>
